@@ -1,0 +1,60 @@
+﻿@model IEnumerable<Avtobus1.DAL.Entities.Url>
+
+<h2>Сокращения ссылок URL</h2>
+<a asp-action="Create" class="btn btn-primary mb-3">Добавить</a>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Длинный URL</th>
+            <th>Сокращенный URL</th>
+            <th>Дата создания</th>
+            <th>Количество переходов</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td><a href="@item.LongUrl" target="_blank">@item.LongUrl</a></td>
+                <td>
+                    <a href=@item.ShortUrl target="_blank">
+                        @($"{Context.Request.Scheme}://{Context.Request.Host}/{item.ShortUrl}")
+                    </a>
+                </td>
+                <td>@item.CreateAt.ToString()</td>
+                <td>@item.Сlicks</td>
+                <td>
+                    <div class="btn-group-vertical" >
+                        <a asp-action="Edit" asp-route-shortUrl="@item.ShortUrl" class="btn btn-warning btn-sm">Обновить</a>
+                        <button class="btn btn-danger delete-btn btn-sm" data-id="@item.ShortUrl">Удалить</button>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll(".delete-btn").forEach(button => {
+            button.addEventListener("click", function () {
+                let id = this.getAttribute("data-id");
+
+                if (!confirm("Вы уверены, что хотите удалить эту ссылку?")) return;
+
+                fetch(`/Delete/${id}`, { method: "POST" })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload();
+                        } else {
+                            alert("Ошибка при удалении!");
+                        }
+                    })
+                    .catch(error => console.error("Ошибка:", error));
+            });
+        });
+    </script>
+}

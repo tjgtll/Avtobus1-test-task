@@ -1,0 +1,50 @@
+﻿@model Avtobus1.DAL.Entities.Url
+
+<h2>Редактировать ссылку</h2>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="ShortUrl"/>
+    <div class="mb-3">
+        <label class="form-label">Длинная ссылка</label>
+        <input asp-for="LongUrl" class="form-control" required />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Короткая ссылка</label>
+        <div class="input-group">
+            <input type="text" name="newShortUrl" class="form-control" value="@Model.ShortUrl" required readonly />
+            <button type="button" class="btn btn-secondary" id="generateShortUrl">Генерировать</button>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Количество переходов</label>
+        <input type="number" asp-for="Сlicks" class="form-control" readonly />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+</form>
+
+@section Scripts {
+    <script>
+        document.getElementById("generateShortUrl").addEventListener("click", function () {
+            let longUrl = document.getElementById("LongUrl").value;
+
+            if (!longUrl.trim()) {
+                alert("Введите длинный URL перед генерацией!");
+                return;
+            }
+
+            fetch("/GenerateShortUrl", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ longUrl })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.querySelector("input[name='newShortUrl']").value = data.shortUrl;
+            })
+            .catch(error => console.error("Ошибка:", error));
+        });
+    </script>
+}
